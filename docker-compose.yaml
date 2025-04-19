@@ -1,0 +1,54 @@
+version: "3.11"
+
+services:
+  db:
+    image: postgres:latest
+    container_name: VPT_db
+    restart: "no"
+    volumes:
+      - VPT_Data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - VPT-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: VPT_pgadmin
+    restart: "no"
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    depends_on:
+      - db
+    networks:
+      - VPT-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    volumes:
+      - ./backend:/code
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      - PYTHONPATH=/app
+      - WATCHFILES_FORCE_POLLING=true
+    networks:
+      - VPT-network
+
+volumes:
+  VPT_Data:
+
+networks:
+  VPT-network:
+    driver: bridge
