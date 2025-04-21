@@ -4,3 +4,10 @@ numpy
 mediapipe
 sqlalchemy==1.4.25
 python-dotenv==1.0.0
+PyJWT
+passlib == 1.7.4
+requests
+python-jose
+uvicorn== 0.27.1
+pydantic == 2.7.2
+httpx >= 0.20.0

@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from db.base_class import Base
 import datetime
 
-        
+
 class User(Base):
     __tablename__ = "users"
 
@@ -11,11 +11,14 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
+    hashed_password = Column(String)
     first_name = Column(String)
     last_name = Column(String)
-    is_active = Column(Boolean, default=1) # 1 for active, 0 for inactive
+    is_active = Column(Boolean, default=1)  # 1 for active, 0 for inactive
     create_at = Column(DateTime, default=datetime.datetime.now)
-    updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
+    updated_at = Column(
+        DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now
+    )
     user_role = Column(Integer, ForeignKey("roles.id"), default=2)
 
     role = relationship("Role", back_populates="users")
