@@ -8,7 +8,7 @@ class UserCreate(BaseModel):
     password: str
     first_name: str
     last_name: str
-    role: str
+    user_role: str
 
 
 class RequestDetails(BaseModel):

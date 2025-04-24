@@ -20,6 +20,7 @@ from auth.utils import (
 )
 from models.user import User
 from models.token import Token
+from models.role import Role
 from auth.auth_bearer import JWTBearer
 from auth.utils import JWT_SECRET_KEY, ALGORITHM
 
@@ -75,8 +76,6 @@ def check_is_correct_string(string: str):
 
 def password_is_correct(password: str):
     if len(password) < 8:
-        return False
-    if not any()(char.isdigit() for char in password):
         return False
     if not any(char.isupper() for char in password):
         return False
@@ -167,14 +166,14 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
         )
     encrypted_password = get_hashed_password(user.password)
     new_user = User(
-        **UserCreate(
-            username=user.username,
-            email=user.email,
-            password=encrypted_password,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            role=user.role,
-        ).dict()
+        **user
+        # username=user.username,
+        # email=user.email,
+        # password=encrypted_password,
+        # first_name=user.first_name,
+        # last_name=user.last_name,
+        # role=user.user_role,
+        .dict()
     )
     new_user.hashed_password = encrypted_password
     db.add(new_user)
@@ -242,8 +241,27 @@ async def logout(dependecies=Depends(JWTBearer()), db: Session = Depends(get_db)
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@user_router.get("/users/me", response_model=User)
-async def get_current_user_data(
+@user_router.get("/users/me")
+async def read_current_user_data(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     return current_user
+
+
+@user_router.delete("/delete")
+async def delete_user(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.id == current_user.id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    user_token = db.query(Token).filter(Token.user_id == user.id).all()
+    for token in user_token:
+        db.delete(token)
+    db.delete(user)
+    db.commit()
+    return {"message": "User deleted successfully"}

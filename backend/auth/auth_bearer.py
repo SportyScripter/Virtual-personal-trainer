@@ -1,8 +1,8 @@
 import jwt
 from jwt.exceptions import InvalidTokenError
-from fastapi import HTTPException,Request
+from fastapi import HTTPException, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from auth_bearer import JWT_SECRET_KEY, ALGORITHM
+from auth.utils import JWT_SECRET_KEY, ALGORITHM
 
 
 def decodeJWT(jwtoken: str):

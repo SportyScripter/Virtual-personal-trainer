@@ -11,3 +11,4 @@ python-jose
 uvicorn== 0.27.1
 pydantic == 2.7.2
 httpx >= 0.20.0
+psycopg2-binary==2.9.6    

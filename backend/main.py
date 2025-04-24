@@ -7,6 +7,8 @@ from core.config import settings
 from auth.utils import JWT_SECRET_KEY, ALGORITHM
 from models.token import Token
 from functools import wraps
+from routers.role_routers import role_routers
+
 
 def create_table():
     try:
@@ -14,13 +16,14 @@ def create_table():
         print("Table created successfully")
     except Exception as e:
         print(f"Error creating table: {e}")
-        
+
+
 def start_application():
     app = FastAPI(
         title=settings.PROJECT_NAME,
-        version= settings.PROJECT_VERSION,
+        version=settings.PROJECT_VERSION,
         openapi_url="/api/v1/openapi.json",
-        secret_key = JWT_SECRET_KEY,
+        secret_key=JWT_SECRET_KEY,
     )
     app.add_middleware(
         CORSMiddleware,
@@ -32,12 +35,11 @@ def start_application():
     create_table()
     return app
 
+
 app = start_application()
 
 app.include_router(user_router)
-
-
-
+app.include_router(role_routers)
 
 
 @app.get("/")
