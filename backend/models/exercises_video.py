@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from db.base_class import Base
 import datetime
+import models
 
 
 class ExerciseVideo(Base):

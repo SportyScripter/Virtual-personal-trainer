@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from db.base_class import Base
 import datetime
+import models
 
 
 class User(Base):
@@ -19,9 +20,9 @@ class User(Base):
     updated_at = Column(
         DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now
     )
-    user_role = Column(Integer, ForeignKey("roles.id"), default=2)
+    user_role = Column(Integer, ForeignKey("roles.id"), default=1)
 
-    role = relationship("Role", back_populates="users")
+    role = relationship("Role", back_populates="user")
     tokens = relationship("Token", back_populates="user")
     exercise_videos = relationship("ExerciseVideo", back_populates="user")
 
