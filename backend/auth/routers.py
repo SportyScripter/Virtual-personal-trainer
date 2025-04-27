@@ -28,49 +28,43 @@ user_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def check_is_correct_string(string: str):
-    try:
-        table_with_not_correct_characters = [
-            "!",
-            "@",
-            "#",
-            "$",
-            "%",
-            "^",
-            "&",
-            "*",
-            "(",
-            ")",
-            "-",
-            "_",
-            "+",
-            "=",
-            "{",
-            "}",
-            "[",
-            "]",
-            "|",
-            "\\",
-            ":",
-            ";",
-            "'",
-            '"',
-            "<",
-            ">",
-            ",",
-            ".",
-            "?",
-            "/",
-            " ",
-        ]
-        if any(char in table_with_not_correct_characters for char in string):
-            return False
-        elif string.isnumeric():
-            return False
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Error: {e}",
-        )
+    table_with_not_correct_characters = [
+        "!",
+        "@",
+        "#",
+        "$",
+        "%",
+        "^",
+        "&",
+        "*",
+        "(",
+        ")",
+        "-",
+        "_",
+        "+",
+        "=",
+        "{",
+        "}",
+        "[",
+        "]",
+        "|",
+        "\\",
+        ":",
+        ";",
+        "'",
+        '"',
+        "<",
+        ">",
+        ",",
+        ".",
+        "?",
+        "/",
+        " ",
+    ]
+    if any(char in table_with_not_correct_characters for char in string):
+        return False
+    elif string.isnumeric():
+        return False
     return True
 
 
@@ -140,45 +134,48 @@ def get_token_response(user_id: int, db: Session):
 
 @user_router.post("/register", response_model=TokenSchama)
 async def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    if db.query(User).filter_by(email=user.email).first():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
-        )
-    if not check_is_correct_string(user.username):
+    try:
+        if db.query(User).filter_by(email=user.email).first():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
+            )
+        if db.query(User).filter_by(username=user.username).first():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already registered",
+            )
+        if not check_is_correct_string(user.username):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username contains not correct characters",
+            )
+        if not check_is_correct_string(user.first_name):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="First name contains not correct characters",
+            )
+        if not check_is_correct_string(user.last_name):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Last name contains not correct characters",
+            )
+        if not password_is_correct(user.password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Password must contain at least 8 characters, including at least one uppercase letter, one lowercase letter, and one digit",
+            )
+        encrypted_password = get_hashed_password(user.password)
+        new_user = User(**user.dict())
+        new_user.hashed_password = encrypted_password
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username contains not correct characters",
+            detail=f"Error: {e}",
         )
-    if not check_is_correct_string(user.first_name):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="First name contains not correct characters",
-        )
-    if not check_is_correct_string(user.last_name):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Last name contains not correct characters",
-        )
-    if not password_is_correct(user.password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must contain at least 8 characters, including at least one uppercase letter, one lowercase letter, and one digit",
-        )
-    encrypted_password = get_hashed_password(user.password)
-    new_user = User(
-        **user
-        # username=user.username,
-        # email=user.email,
-        # password=encrypted_password,
-        # first_name=user.first_name,
-        # last_name=user.last_name,
-        # role=user.user_role,
-        .dict()
-    )
-    new_user.hashed_password = encrypted_password
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
     return get_token_response(new_user.id, db)
 
 
