@@ -19,7 +19,7 @@ onChange,
 error,
 }) => (
 <div className="flex flex-col mb-4">
-    <label className="mb-1 text-sm text-gray-600">{label}</label>
+    <label className="mb-1 font-semibold text-white text-sm tracking-wide">{label}</label>
     <input
     type={type}
     name={name}

@@ -22,6 +22,6 @@ docker-compose up
 
 to start frontend app
 ```bash
- npx @tailwindcss/cli -i ./src/index.css -o ./src/output.css --watch
+npm run dev
  ```
 

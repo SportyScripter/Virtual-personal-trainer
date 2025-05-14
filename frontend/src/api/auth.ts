@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/auth"; // zakładam, że backend działa na porcie 8000
+const API_URL = "http://localhost:8080/auth"; 
 
 export const register = async (data: any) => {
   return await axios.post(`${API_URL}/register`, data);
@@ -8,4 +8,8 @@ export const register = async (data: any) => {
 
 export const login = async (data: any) => {
   return await axios.post(`${API_URL}/login`, data);
+};
+
+export const userData = async (data: any) => {
+  return await axios.get(`${API_URL}/users/me`, data);
 };

@@ -35,6 +35,7 @@ def create_access_token(subject: Union[str, Any], expires_delta: int = None) -> 
         to_encode = {"exp": expires_delta, "sub": str(subject)}
     return jwt.encode(to_encode, JWT_REFRESH_SECRET_KEY, algorithm=ALGORITHM)
 
+
 def create_refresh_token(subject: Union[str, Any], expires_delta: int = None) -> str:
     if expires_delta is not None:
         expires_delta = datetime.now(timezone.utc) + expires_delta
@@ -44,6 +45,7 @@ def create_refresh_token(subject: Union[str, Any], expires_delta: int = None) ->
         )
     to_encode = {"exp": expires_delta, "sub": str(subject)}
     return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
+
 
 def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
@@ -61,7 +63,7 @@ async def get_current_user(
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        heades={"WWW-Authenticate": "Bearer"},
+        headers={"WWW-Authenticate": "Bearer"},
     )
     token = credentials.credentials
     try:
@@ -72,7 +74,7 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
     user = get_user(user_id, db)
-    if user is None or user.is_active:
+    if user is None or not user.is_active:
         raise credentials_exception
     return user
 

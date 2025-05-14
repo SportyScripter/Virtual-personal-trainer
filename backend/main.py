@@ -9,6 +9,10 @@ from models.token import Token
 from functools import wraps
 from routers.role_routers import role_routers
 
+origins = [
+    "http://localhost:5173",
+]
+
 
 def create_table():
     try:
@@ -27,7 +31,7 @@ def start_application():
     )
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
