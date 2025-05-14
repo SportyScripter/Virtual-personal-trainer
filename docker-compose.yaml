@@ -45,6 +45,20 @@ services:
       - WATCHFILES_FORCE_POLLING=true
     networks:
       - VPT-network
+  
+  # frontend:
+  #   image: node:latest 
+  #   container_name: VPT_frontend
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "5173:5173"  # Mapowanie portu 5173 na hoście i w kontenerze
+  #   volumes:
+  #     - ./frontend:/app  # Mapowanie kodu źródłowego do kontenera (aby zmiany były widoczne w czasie rzeczywistym)
+  #   command: sh -c "npm install && npm run dev"  # Uruchomienie aplikacji w trybie developerskim
+  #   networks:
+  #     - VPT-network
 
 volumes:
   VPT_Data:
