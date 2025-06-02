@@ -43,6 +43,18 @@ const UserDashboard = () => {
   if (!user) return <div>Ładowanie...</div>;
 
   return (
+    <div>
+      <header className="w-full text-center bg-gray-500 bg-cover bg-center">
+    <h1>Virtual Personal Trainer</h1>
+    <nav>
+        <ul className="flex justify-center space-x-4">
+            <li><a href="#">Strona główna</a></li>
+            <li><a href="#">O nas</a></li>
+            <li><a href="#">Kontakt</a></li>
+        </ul>
+    </nav>
+</header>
+    
     <div className="flex min-h-screen">
       {/* Dashboard po lewej stronie */}
       <aside className="w-64 border-r border-gray-300 p-6 bg-gray-300">
@@ -55,7 +67,7 @@ const UserDashboard = () => {
             src={user.profile_image || "/images/avatar.png"} // Domyślny avatar
             alt="avatar"
             className="w-20 h-20 rounded-full mb-4"
-          />
+            />
           <h3 className="text-xl font-semibold mb-1">{user.username}</h3>
           <p className="text-sm mb-12 text-gray-600">{user.email}</p>
           <ConstSizeButton>Ustawienia Konta</ConstSizeButton>
@@ -74,6 +86,7 @@ const UserDashboard = () => {
         <p className="text-white">To jest Twoja strona startowa.</p>
       </main>
     </div>
+            </div>
   );
 }
 export default UserDashboard;
