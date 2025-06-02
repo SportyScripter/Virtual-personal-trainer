@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { userData } from "../api/auth";
-import { SecondaryButton } from "../components/Button";
+import { ConstSizeButton } from "../components/Button";
 interface User {
   username: string;
   email: string;
@@ -58,8 +58,11 @@ const TrainerDashboard = () => {
           />
           <h3 className="text-xl font-semibold mb-1">{user.username}</h3>
           <p className="text-sm mb-12 text-gray-600">{user.email}</p>
-          <SecondaryButton>Dodaj ćwiczenie</SecondaryButton>
-          <SecondaryButton>Moi podopieczni</SecondaryButton>
+          <ConstSizeButton>Dodaj ćwiczenie</ConstSizeButton>
+          <ConstSizeButton>Moi podopieczni</ConstSizeButton>
+          <ConstSizeButton>Moje ćwiczenia</ConstSizeButton>
+          <ConstSizeButton>Ustawienia Konta</ConstSizeButton>
+          <ConstSizeButton>Wyloguj</ConstSizeButton>
         </div>
       </aside>
 
