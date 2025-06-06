@@ -50,6 +50,9 @@ const Login = () => {
         },
       });
       setUser(res.data);
+      localStorage.setItem("user_role", res.data.user_role);
+      localStorage.setItem("username", res.data.username);
+      localStorage.setItem("email", res.data.email);
 
       if (res.data.user_role == "1") {
         navigate("/UserDashboard");
@@ -66,11 +69,12 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-[url('../public/images/background.png')] bg-cover bg-center">
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-2xl font-bold mb-6">Login</h1>
+        <h1 className="text-5xl font-bold mb-6 text-white">Login</h1>
         <form onSubmit={handleSubmit} className="w-80">
           <Input label="Email" name="email" value={formData.email} onChange={handleChange} />
           <Input label="Password" name="password" type="password" value={formData.password} onChange={handleChange} />
           <Button type="submit">Login</Button>
+          <Button type="button" onClick={() => navigate("/register")}> Register</Button>
         </form>
       </div>
     </div>
