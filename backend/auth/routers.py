@@ -217,7 +217,7 @@ async def change_password(request: RequestDetails, db: Session = Depends(get_db)
     return {"message": "Password changed successfully"}
 
 
-@user_router.post("/logut")
+@user_router.post("/logout")
 async def logout(dependecies=Depends(JWTBearer()), db: Session = Depends(get_db)):
     try:
         token = dependecies

@@ -8,6 +8,9 @@ from auth.utils import JWT_SECRET_KEY, ALGORITHM
 from models.token import Token
 from functools import wraps
 from routers.role_routers import role_routers
+from routers.body_part_routers import seed_body_parts
+from db.session import SessionLocal
+from contextlib import asynccontextmanager
 
 origins = [
     "http://localhost:5173",
@@ -22,12 +25,23 @@ def create_table():
         print(f"Error creating table: {e}")
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    db = SessionLocal()
+    try:
+        seed_body_parts(db)
+        yield
+    finally:
+        db.close()
+
+
 def start_application():
     app = FastAPI(
         title=settings.PROJECT_NAME,
         version=settings.PROJECT_VERSION,
         openapi_url="/api/v1/openapi.json",
         secret_key=JWT_SECRET_KEY,
+        lifespan=lifespan,
     )
     app.add_middleware(
         CORSMiddleware,
@@ -41,6 +55,7 @@ def start_application():
 
 
 app = start_application()
+
 
 app.include_router(user_router)
 app.include_router(role_routers)

@@ -54,8 +54,8 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-[url('../public/images/background.png')] bg-cover bg-center">
 
-    <div className=" bg-white/10 shadow-lg p-8 flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-center text-white">Register</h1>
+    <div className="shadow-lg p-8 flex flex-col items-center justify-center min-h-screen">
+      <h1 className="text-5xl font-bold mb-6 text-center text-white">Register</h1>
       <form onSubmit={handleSubmit} className="w-80 space-y-4 text-black">
         <Input label="Email" name="email" value={formData.email} onChange={handleChange} error={errors.email} />
         <Input label="Username" name="username" value={formData.username} onChange={handleChange} error={errors.username}/>
@@ -73,6 +73,7 @@ const Register = () => {
         </div>
   
         <Button type="submit">Register</Button>
+        <Button type="button" onClick={() => navigate("/login")}>Anuluj</Button>
       </form>
     </div>
     </div>

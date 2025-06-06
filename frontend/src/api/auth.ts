@@ -13,3 +13,16 @@ export const login = async (data: any) => {
 export const userData = async (data: any) => {
   return await axios.get(`${API_URL}/users/me`, data);
 };
+
+export const logout = async (token: string) => {
+  return await axios.post(
+    `${API_URL}/logout`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+
