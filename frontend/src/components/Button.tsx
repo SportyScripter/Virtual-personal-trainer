@@ -1,12 +1,13 @@
 import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../api/auth";
+import { logout as apiLogout } from "../api/auth";
+import { useAuth } from "../context/AuthContext"; // <- import kontekstu
 
 interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
-  type?: "button" | "submit";
+  type?: "button" | "submit" | "reset";
 }
 
 export const Button: React.FC<ButtonProps> = ({ children, onClick, type = "button" }) => (
@@ -74,17 +75,18 @@ export const SmallButton: React.FC<ButtonProps> = ({ children, onClick, type = "
 
 export const LogoutButton: React.FC<ButtonProps> = ({ children, type = "button" }) => {
   const navigate = useNavigate();
+  const { logout, token } = useAuth(); // <- pobieramy logout z kontekstu
 
   const handleLogout = async () => {
-    const token = localStorage.getItem("token");
     if (!token) return;
 
     try {
-      await logout(token);
-      localStorage.removeItem("token");
-      navigate("/login");
+      await apiLogout(token); // <- wysyłamy token
     } catch (error) {
       console.error("Logout failed:", error);
+    } finally {
+      logout(); // <- czyści stan kontekstu
+      navigate("/login");
     }
   };
 
@@ -98,4 +100,3 @@ export const LogoutButton: React.FC<ButtonProps> = ({ children, type = "button" 
     </button>
   );
 };
-

@@ -36,14 +36,32 @@ def create_access_token(subject: Union[str, Any], expires_delta: int = None) -> 
     return jwt.encode(to_encode, JWT_REFRESH_SECRET_KEY, algorithm=ALGORITHM)
 
 
-def create_refresh_token(subject: Union[str, Any], expires_delta: int = None) -> str:
+# def create_refresh_token(subject: Union[str, Any], expires_delta: int = None) -> str:
+#     if expires_delta is not None:
+#         expires_delta = datetime.now(timezone.utc) + expires_delta
+#     else:
+#         expires_delta = datetime.now(timezone.utc) + timedelta(
+#             minutes=ACCES_TOKEN_EXPIRE_MINUTES
+#         )
+#     to_encode = {"exp": expires_delta, "sub": str(subject)}
+#     return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
+import uuid
+
+
+def create_refresh_token(
+    subject: Union[str, Any], expires_delta: timedelta = None
+) -> str:
     if expires_delta is not None:
         expires_delta = datetime.now(timezone.utc) + expires_delta
     else:
         expires_delta = datetime.now(timezone.utc) + timedelta(
             minutes=ACCES_TOKEN_EXPIRE_MINUTES
         )
-    to_encode = {"exp": expires_delta, "sub": str(subject)}
+    to_encode = {
+        "exp": expires_delta,
+        "sub": str(subject),
+        "jti": str(uuid.uuid4()),  # <-- unikalny identyfikator tokena
+    }
     return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=ALGORITHM)
 
 

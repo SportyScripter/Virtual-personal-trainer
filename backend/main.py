@@ -12,9 +12,7 @@ from routers.body_part_routers import seed_body_parts
 from db.session import SessionLocal
 from contextlib import asynccontextmanager
 
-origins = [
-    "http://localhost:5173",
-]
+origins = ["http://localhost:5173"]
 
 
 def create_table():

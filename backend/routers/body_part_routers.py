@@ -3,6 +3,10 @@ from schemas.body_part import BodyPartCreate
 from sqlalchemy.orm import Session
 from models.body_part import BodyPart
 from enum import Enum
+from fastapi import APIRouter, Depends, HTTPException, status
+from models.body_part import BodyPart
+
+excercise_router = APIRouter(prefix="/body_parts", tags=["body_parts"])
 
 
 class BodyPartEnum(Enum):
@@ -25,3 +29,15 @@ def seed_body_parts(db: Session):
             db.add(BodyPart(body_part_name=part.value))
             print(f"Added body part: {part.value}")
     db.commit()
+
+
+@excercise_router.get("/list")
+async def get_body_parts(db: Session = Depends(get_db)):
+    body_parts = db.query(BodyPart.id, BodyPart.body_part_name).all()
+    if not body_parts:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No body parts found",
+        )
+    return [{"id": bp.id, "body_part_name": bp.body_part_name} for bp in body_parts]
+
