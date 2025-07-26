@@ -5,7 +5,7 @@ import UserDashboard from "./pages/UserDashboard";
 import TrainerDashboard from "./pages/TrainerDashboard"; 
 import StartPage from "./pages/StarPage"
 import Dashboard from "./pages/Dashboard";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+import { ProtectedRoute } from "./components/ProtectRoute";
 
 function App() {
   return (

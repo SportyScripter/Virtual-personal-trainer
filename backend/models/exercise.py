@@ -9,7 +9,8 @@ class Exercise(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     exercise_name = Column(String, unique=True, index=True)
     body_part_id = Column(Integer, ForeignKey("body_parts.id"))
-
+    description = Column(String, nullable=True)
+    
     exercise_videos = relationship("ExerciseVideo", back_populates="exercise")
     body_part = relationship("BodyPart", back_populates="exercise")
 

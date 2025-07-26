@@ -124,9 +124,12 @@ def get_token_response(user_id: int, db: Session):
         refresh_token=refresh_token,
         status=True,
     )
-
     db.add(token_db)
-    db.commit()
+    try:
+        db.commit()
+    except Exception as e:
+        print(f"Błąd podczas commit: {e}")
+        raise
     db.refresh(token_db)
 
     return {"access_token": access_token, "refresh_token": refresh_token}

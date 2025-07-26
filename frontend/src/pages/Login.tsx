@@ -3,23 +3,16 @@ import Input from "../components/Input";
 import { Button } from "../components/Button";
 import { login, userData } from "../api/auth";
 import { useNavigate } from "react-router-dom";
-
-interface User {
-  username: string;
-  email: string;
-  profile_image?: string; 
-  user_role?: string;
-}
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { user, loginWithToken, loading } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
-  const [user, setUser] = useState<User | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,42 +22,27 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await login(formData);
-      localStorage.setItem("token", res.data.refresh_token);
-      alert("Logged in successfully!");
-
-      fetchUserData();
+      console.log("Login response data:", res.data);
+      const token = res.data.refresh_token;
+      if (!token) throw new Error("Brak refresh_token w odpowiedzi");
+      await loginWithToken(token);
     } catch (error: any) {
       console.error(error.response?.data?.detail || error.message);
-      alert(error.response?.data?.detail || "Login failed");
+      alert(error.response?.data?.detail || "Błąd logowania");
     }
   };
 
-  const fetchUserData = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    try {
-      const res = await userData({
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setUser(res.data);
-      localStorage.setItem("user_role", res.data.user_role);
-      localStorage.setItem("username", res.data.username);
-      localStorage.setItem("email", res.data.email);
-
-      if (res.data.user_role == "1") {
+  useEffect(() => {
+    if (user && !loading) {
+      if (user.role == "1") {
+        console.log("Zalogowany jako użytkownik User:", user.role);
         navigate("/UserDashboard");
-      } else if (res.data.user_role == "2") {
+      } else if (user.role === "2") {
+        console.log("Zalogowany jako użytkownik Trainer:", user.role);
         navigate("/TrainerDashboard");
-      } else {
-        alert("Invalid role");
       }
-    } catch (err) {
-      console.error("Błąd podczas pobierania danych użytkownika", err);
     }
-  };
+  }, [user, loading, navigate]);
 
   return (
     <div className="min-h-screen bg-[url('../public/images/background.png')] bg-cover bg-center">

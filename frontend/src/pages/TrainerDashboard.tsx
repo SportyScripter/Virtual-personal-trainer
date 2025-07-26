@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 const TrainerDashboard = () => {
   const { user } = useAuth();
 
-  if (!localStorage.getItem("username") == null) return <div>Ładowanie...</div>;
+  if (!user?.username == null) return <div>Ładowanie...</div>;
 
   return (
 <MainLayout>
