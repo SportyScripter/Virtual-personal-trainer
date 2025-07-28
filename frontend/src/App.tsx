@@ -17,6 +17,7 @@ function App() {
         <Route path="/UserDashboard" element={<UserDashboard />} />
         <Route path="/TrainerDashboard" element={<TrainerDashboard />} />
         <Route path="/dashboard"element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/>
+        <Route path="/addExercise"element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/>
       </Routes>
     </Router>
   );

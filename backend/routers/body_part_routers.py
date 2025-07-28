@@ -6,7 +6,7 @@ from enum import Enum
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.body_part import BodyPart
 
-excercise_router = APIRouter(prefix="/body_parts", tags=["body_parts"])
+body_part_router = APIRouter(prefix="/body_parts", tags=["body_parts"])
 
 
 class BodyPartEnum(Enum):
@@ -31,7 +31,7 @@ def seed_body_parts(db: Session):
     db.commit()
 
 
-@excercise_router.get("/list")
+@body_part_router.get("/list")
 async def get_body_parts(db: Session = Depends(get_db)):
     body_parts = db.query(BodyPart.id, BodyPart.body_part_name).all()
     if not body_parts:
@@ -40,4 +40,3 @@ async def get_body_parts(db: Session = Depends(get_db)):
             detail="No body parts found",
         )
     return [{"id": bp.id, "body_part_name": bp.body_part_name} for bp in body_parts]
-
