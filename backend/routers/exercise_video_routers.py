@@ -22,7 +22,6 @@ async def createPathForUser(
     return user_directory
 
 
-# przerobić to by sprawdzało czy ścieżka już istnieje i jeśli tak to nie tworzyło kolejnej.
 async def check_and_create_path_for_user(
     username: str,
     body_part_name: str,
@@ -35,36 +34,6 @@ async def check_and_create_path_for_user(
     elif not os.path.exists(user_directory):
         os.makedirs(user_directory)
     return user_directory
-
-
-# Create a new exercise video
-# async def create_exercise_video(
-#     file: str,
-#     user_id: int,
-#     body_part_id: int,
-#     exercise_id: int,
-#     exercise_video: CreateExerciseVideo,
-#     db: Session = Depends(get_db),
-# ):
-#     user = db.query(User).filter(User.id == user_id).first()
-#     body_part = db.query(BodyPart).filter(BodyPart.id == body_part_id).first()
-#     excercise = db.query(Exercise).filter(Exercise.id == exercise_id).first()
-#     user_directory = await check_if_path_exists(
-#         user.username, body_part.body_part_name, excercise.exercise_name, db
-#     )
-#     video_path = os.path.join(
-#         user_directory, f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4"
-#     )
-#     new_exercise_video = exercise_video(
-#         user_id = user_id,
-#         excercise_id = exercise_id,
-#         video_path = video_path)
-#     db.add(new_exercise_video)
-#     db.commit()
-#     db.refresh(new_exercise_video)
-#     return {
-#         "message": "Exercise video created successfully",
-#     }
 
 
 async def create_exercise_video(

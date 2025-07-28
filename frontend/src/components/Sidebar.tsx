@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ConstSizeButton, LogoutButton } from "./Button";
 import TrainerDashboard from "../pages/TrainerDashboard";
-
+import { Link } from "react-router-dom";
 interface SidebarProps {
   username: string | null;
   email: string | null;
@@ -75,7 +75,9 @@ export const TrainerSidebar: React.FC<SidebarProps> = ({ username, email, profil
         <p className="text-sm mb-12 text-gray-600">{email}</p>
 
         <ConstSizeButton>Ustawienia Konta</ConstSizeButton>
+        <Link to="/addExercise" className="w-full">
         <ConstSizeButton>Dodaj ćwiczenie</ConstSizeButton>
+        </Link>
         <ConstSizeButton>Moi podopieczni</ConstSizeButton>
         <ConstSizeButton>Moje ćwiczenia</ConstSizeButton>
         <ConstSizeButton>Moje ćwiczenia</ConstSizeButton>
