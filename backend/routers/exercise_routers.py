@@ -5,7 +5,7 @@ from models.exercise import Exercise
 from schemas.exercise import ExerciseCreate, ResponseModelExercise
 from models.body_part import BodyPart
 
-exercise_router = APIRouter(prefix="/exercises", tags=["exercises"])
+exercise_router = APIRouter(prefix="/exercise", tags=["Exercises"])
 
 
 @exercise_router.post(
@@ -25,6 +25,7 @@ async def create_exercise(exercise: ExerciseCreate, db: Session = Depends(get_db
         exercise_name=exercise.exercise_name,
         body_part_id=exercise.body_part_id,
         description=exercise.description,
+        user_id=exercise.user_id,
     )
 
     db.add(new_exercise)

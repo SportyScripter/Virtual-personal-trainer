@@ -10,7 +10,7 @@ import datetime
 import os
 import asyncio
 
-exercise_video_router = APIRouter(prefix="/exercise_videos", tags=["exercise_videos"])
+exercise_video_router = APIRouter(prefix="/exercise_video", tags=["Exercise Videos"])
 
 
 async def createPathForUser(
@@ -85,12 +85,12 @@ async def create_exercise_video(
     }
 
 
-@exercise_video_router.post("execise-videos")
+@exercise_video_router.post("/upload_video/{exercise_id}")
 async def create_exercise_video_endpoint(
+    exercise_id: int,
     file: UploadFile = File(...),
     user_id: int = Form(...),
     body_part_id: int = Form(...),
-    exercise_id: int = Form(...),
     db: Session = Depends(get_db),
 ):
     return await create_exercise_video(

@@ -75,11 +75,10 @@ export const TrainerSidebar: React.FC<SidebarProps> = ({ username, email, profil
         <p className="text-sm mb-12 text-gray-600">{email}</p>
 
         <ConstSizeButton>Ustawienia Konta</ConstSizeButton>
-        <Link to="/addExercise" className="w-full">
-        <ConstSizeButton>Dodaj ćwiczenie</ConstSizeButton>
+        <Link to="/addExercise" className="w-full" style={{marginRight: "-40px"}}>
+        <ConstSizeButton >Dodaj ćwiczenie</ConstSizeButton>
         </Link>
         <ConstSizeButton>Moi podopieczni</ConstSizeButton>
-        <ConstSizeButton>Moje ćwiczenia</ConstSizeButton>
         <ConstSizeButton>Moje ćwiczenia</ConstSizeButton>
         <LogoutButton>Wyloguj</LogoutButton>
       </div>

@@ -10,7 +10,8 @@ from routers.body_part_routers import seed_body_parts
 from routers.role_routers import seed_roles
 from db.session import SessionLocal
 from contextlib import asynccontextmanager
-
+from fastapi.staticfiles import StaticFiles
+import os
 from auth.routers import user_router
 from routers.role_routers import role_routers
 from routers.body_part_routers import body_part_router
@@ -54,6 +55,9 @@ def start_application():
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    static_files_path = "users_videos"
+    os.makedirs(static_files_path, exist_ok=True)
+    app.mount("/users_videos", StaticFiles(directory=static_files_path), name="videos")
     create_table()
     return app
 

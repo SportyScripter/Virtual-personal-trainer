@@ -3,7 +3,7 @@ import {ConstSizeButton} from "../components/Button";
 import { useNavigate } from "react-router-dom"; 
 
 const StartPage = () => {
-    const navigate = useNavigate(); // hook do nawigacji
+    const navigate = useNavigate(); 
   
     const handleLoginClick = () => {
       navigate("/login");
