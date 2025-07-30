@@ -1,9 +1,14 @@
 from db.session import get_db
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from fastapi import Depends, APIRouter, HTTPException, status
 from models.exercise import Exercise
 from schemas.exercise import ExerciseCreate, ResponseModelExercise
 from models.body_part import BodyPart
+from auth.utils import get_current_user
+from schemas.exercise import UserExerciseResponse
+from typing import List
+from models.user import User
+import os
 
 exercise_router = APIRouter(prefix="/exercise", tags=["Exercises"])
 
@@ -48,3 +53,87 @@ async def delete_last_exercise(db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Last exercise deleted successfully"}
+
+
+@exercise_router.get(
+    "/my_exercises",
+    response_model=List[UserExerciseResponse],
+    summary="Pobierz wszystkie ćwiczenia zalogowanego użytkownika",
+)
+async def get_my_exercises(
+    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
+    """
+    Zwraca listę wszystkich ćwiczeń (wraz z wideo i partią ciała)
+    utworzonych przez aktualnie zalogowanego użytkownika.
+    """
+    exercises = (
+        db.query(Exercise)
+        .filter(Exercise.user_id == current_user.id)
+        .options(joinedload(Exercise.body_part), joinedload(Exercise.exercise_videos))
+        .all()
+    )
+
+    if not exercises:
+        return []
+
+    response_data = []
+    for exercise in exercises:
+        body_part_name = (
+            exercise.body_part.body_part_name if exercise.body_part else "Brak partii"
+        )
+
+        response_data.append(
+            {
+                "id": exercise.id,
+                "exercise_name": exercise.exercise_name,
+                "description": exercise.description,
+                "body_part_name": body_part_name,
+                "videos": exercise.exercise_videos,
+            }
+        )
+
+    return response_data
+
+
+@exercise_router.delete(
+    "/{exercise_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Usuń ćwiczenie i powiązane wideo",
+)
+async def delete_exercise(
+    exercise_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    exercise_to_delete = (
+        db.query(Exercise)
+        .options(joinedload(Exercise.exercise_videos))
+        .filter(Exercise.id == exercise_id)
+        .first()
+    )
+
+    if not exercise_to_delete:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Ćwiczenie nie znalezione."
+        )
+
+    if exercise_to_delete.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Brak uprawnień do usunięcia tego zasobu.",
+        )
+
+    for video in exercise_to_delete.exercise_videos:
+        if os.path.exists(video.video_path):
+            try:
+                os.remove(video.video_path)
+            except OSError as e:
+                print(f"Error deleting file {video.video_path}: {e}")
+
+        db.delete(video)
+
+    db.delete(exercise_to_delete)
+    db.commit()
+
+    return None 
