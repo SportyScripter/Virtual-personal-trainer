@@ -7,7 +7,7 @@ interface InputProps {
     type?: string;
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-    error?: string;  // Dodajemy właściwość błędu
+    error?: string;
 }
   
 const Input: React.FC<InputProps> = ({

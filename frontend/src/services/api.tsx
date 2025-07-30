@@ -13,6 +13,21 @@ const apiClient = axios.create({
   },
 });
 
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const getBodyParts = async (): Promise<BodyPart[]> => {
   try {
     const response = await apiClient.get<BodyPart[]>('/body_parts/list');
@@ -62,17 +77,13 @@ export const createExercise = async (data: ExerciseCreateData): Promise<Exercise
 export const uploadExerciseVideo = async (data: UploadVideoData): Promise<void> => {
   const formData = new FormData();
 
-  // Dodajemy wszystkie dane wymagane przez endpoint backendu jako pola formularza
   formData.append('file', data.videoFile);
   formData.append('user_id', data.userId.toString());
   formData.append('body_part_id', data.bodyPartId.toString());
 
   try {
-    // ID ćwiczenia jest częścią URL, reszta danych jest w ciele formularza
-    // Używamy poprawionej ścieżki z backendu
     await apiClient.post(`/exercise_video/upload_video/${data.exerciseId}`, formData, {
       headers: {
-        // Przeglądarka sama ustawi poprawny Content-Type z 'boundary' dla FormData
         'Content-Type': 'multipart/form-data',
       },
     });
@@ -81,5 +92,43 @@ export const uploadExerciseVideo = async (data: UploadVideoData): Promise<void> 
       throw new Error(error.response.data.detail || "Błąd podczas wysyłania pliku wideo");
     }
     throw new Error("Nie można było wysłać pliku wideo. Sprawdź połączenie z serwerem.");
+  }
+};
+
+
+interface UserExerciseVideo {
+  id: number;
+  video_path: string;
+  create_at: string;
+}
+
+export interface UserExercise {
+  id: number;
+  exercise_name: string;
+  description: string | null;
+  body_part_name: string;
+  videos: UserExerciseVideo[];
+}
+
+export const getMyExercises = async (): Promise<UserExercise[]> => {
+  try {
+    const response = await apiClient.get<UserExercise[]>('/exercise/my_exercises');
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.detail || "Błąd podczas pobierania ćwiczeń");
+    }
+    throw new Error("Nie można pobrać ćwiczeń. Sprawdź połączenie.");
+  }
+};
+
+export const deleteExercise = async (exerciseId: number): Promise<void> => {
+  try {
+      await apiClient.delete(`/exercise/${exerciseId}`);
+  } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+          throw new Error(error.response.data.detail || "Błąd podczas usuwania ćwiczenia");
+      }
+      throw new Error("Nie można usunąć ćwiczenia. Sprawdź połączenie.");
   }
 };

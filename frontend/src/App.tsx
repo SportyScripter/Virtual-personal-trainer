@@ -7,6 +7,7 @@ import StartPage from "./pages/StarPage"
 import Dashboard from "./pages/Dashboard";
 import { ProtectedRoute } from "./components/ProtectRoute";
 import AddExercise from "./pages/AddExercise";
+import MyExercisesPage from "./pages/MyExercisesPage";
 function App() {
   return (
     <Router>
@@ -18,6 +19,8 @@ function App() {
         <Route path="/TrainerDashboard" element={<TrainerDashboard />} />
         <Route path="/dashboard"element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/>
         <Route path="/addExercise"element={<ProtectedRoute><AddExercise/></ProtectedRoute>}/>
+        <Route path="/my-exercises"element={<ProtectedRoute><MyExercisesPage/></ProtectedRoute>}/>
+
       </Routes>
     </Router>
   );
