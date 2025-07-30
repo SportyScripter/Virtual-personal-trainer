@@ -24,7 +24,7 @@ from models.role import Role
 from auth.auth_bearer import JWTBearer
 from auth.utils import JWT_SECRET_KEY, ALGORITHM
 
-user_router = APIRouter(prefix="/auth", tags=["auth"])
+user_router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 def check_is_correct_string(string: str):

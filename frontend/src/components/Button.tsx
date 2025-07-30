@@ -57,7 +57,7 @@ export const ConstSizeButton: React.FC<ButtonProps> = ({ children, onClick, type
     onClick={onClick}
     type={type}
     className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition mb-4"
-    style={{ width: "150px", height: "50px", marginRight: "10px" }} // Ustalona szerokość i wysokość
+    style={{ width: "150px", height: "50px", marginRight: "15px" }} // Ustalona szerokość i wysokość
   >
     {children}
   </button>

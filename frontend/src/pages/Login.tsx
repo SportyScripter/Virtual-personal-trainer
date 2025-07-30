@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Input from "../components/Input";
 import { Button } from "../components/Button";
-import { login, userData } from "../api/auth";
+import { login} from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 

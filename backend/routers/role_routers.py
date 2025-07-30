@@ -3,6 +3,22 @@ from db.session import get_db
 from sqlalchemy.orm import Session
 from schemas.role_shemas import RoleCreate, RoleDelete
 from models.role import Role
+from enum import Enum
+
+
+class role(Enum):
+    User = "Użytkownik"
+    Trainer = "Trener"
+
+
+def seed_roles(db: Session):
+    for role_name in role:
+        exists = db.query(Role).filter_by(role_name=role_name.name).first()
+        if not exists:
+            db.add(Role(role_name=role_name.name, description=role_name.value))
+            print(f"Added role: {role_name.name}")
+    db.commit()
+
 
 role_routers = APIRouter(prefix="/role", tags=["role"])
 

@@ -5,7 +5,8 @@ interface User {
   username: string;
   email: string;
   profile_image?: string | null;
-  role: string; // Zmieniono na string, aby pasowało do backendowego user_role
+  role: string; 
+  id: number; 
 }
 
 interface AuthContextType {
@@ -31,12 +32,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       console.log("Pobrano dane użytkownika:", res.data);
   
-      // Mapowanie backendowego user_role na role string
       const mappedUser: User = {
         username: res.data.username,
         email: res.data.email,
-        role: String(res.data.user_role), // konwersja number -> string
+        role: String(res.data.user_role),
         profile_image: res.data.profile_image || null,
+        id: res.data.id, 
       };
   
       setUser(mappedUser);
@@ -60,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithToken = async (newToken: string) => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
-    await fetchUser(newToken);  // <- TO DODAJ
+    await fetchUser(newToken); 
   };
 
   const logout = () => {

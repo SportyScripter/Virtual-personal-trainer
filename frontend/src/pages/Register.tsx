@@ -44,7 +44,7 @@ const Register = () => {
         alert('Rejestracja zakończona sukcesem!');
         navigate('/login')
       } catch (error) {
-        alert('Błąd podczas rejestracji');
+        alert('Błąd podczas rejestracji'+ error);
         console.log(JSON.stringify(formData, null, 2));
       }
   };
