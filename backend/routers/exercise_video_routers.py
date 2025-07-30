@@ -35,7 +35,6 @@ async def check_and_create_path_for_user(
         os.makedirs(user_directory)
     return user_directory
 
-
 async def create_exercise_video(
     file: UploadFile = File(...),
     user_id: int = Form(...),
@@ -45,43 +44,52 @@ async def create_exercise_video(
 ):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
+        raise HTTPException(status_code=404, detail="User not found")
     body_part = db.query(BodyPart).filter(BodyPart.id == body_part_id).first()
     if not body_part:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Body part not found",
-        )
+        raise HTTPException(status_code=404, detail="Body part not found")
     exercise = db.query(Exercise).filter(Exercise.id == exercise_id).first()
-    user_directory = await check_and_create_path_for_user(
+    if not exercise:
+        raise HTTPException(status_code=404, detail="Exercise not found")
+
+
+    relative_user_directory = os.path.join(
         user.username, body_part.body_part_name, exercise.exercise_name
     )
+
+    full_system_path = os.path.join("/videos", relative_user_directory)
+
+    os.makedirs(full_system_path, exist_ok=True)
+
     file_extension = os.path.splitext(file.filename)[1] if file.filename else ".mp4"
     file_name = f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}{file_extension}"
-    video_path = os.path.join(user_directory, file_name)
+
+    full_video_path_to_save = os.path.join(full_system_path, file_name)
+
+    relative_video_path_to_db = os.path.join(relative_user_directory, file_name)
+
     try:
-        with open(video_path, "wb") as buffer:
+        with open(full_video_path_to_save, "wb") as buffer:
             buffer.write(await file.read())
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=500,
             detail=f"Error saving file: {str(e)}",
         )
+
     new_exercise_video = ExerciseVideo(
         user_id=user_id,
         exercise_id=exercise_id,
-        video_path=video_path,
+        video_path=relative_video_path_to_db,
     )
     db.add(new_exercise_video)
     db.commit()
     db.refresh(new_exercise_video)
+
     return {
         "message": "Exercise video created successfully",
         "video_id": new_exercise_video.id,
-        "video_path": video_path,
+        "video_path": relative_video_path_to_db,
     }
 
 

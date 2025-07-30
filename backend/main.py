@@ -55,9 +55,9 @@ def start_application():
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    static_files_path = "users_videos"
+    static_files_path = "/videos"
     os.makedirs(static_files_path, exist_ok=True)
-    app.mount("/users_videos", StaticFiles(directory=static_files_path), name="videos")
+    app.mount("/videos", StaticFiles(directory=static_files_path), name="videos")
     create_table()
     return app
 

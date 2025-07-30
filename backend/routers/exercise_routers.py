@@ -63,10 +63,7 @@ async def delete_last_exercise(db: Session = Depends(get_db)):
 async def get_my_exercises(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
-    """
-    Zwraca listę wszystkich ćwiczeń (wraz z wideo i partią ciała)
-    utworzonych przez aktualnie zalogowanego użytkownika.
-    """
+  
     exercises = (
         db.query(Exercise)
         .filter(Exercise.user_id == current_user.id)

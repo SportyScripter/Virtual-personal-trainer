@@ -36,6 +36,7 @@ services:
       dockerfile: dockerfile
     volumes:
       - ./backend:/code
+      - ./users_videos:/videos
     ports:
       - "8080:80"
     depends_on:
