@@ -38,7 +38,9 @@ export const UserSidebar: React.FC<SidebarProps> = ({ username, email, profileIm
 
         <ConstSizeButton>Ustawienia Konta</ConstSizeButton>
         <ConstSizeButton>Trenerzy</ConstSizeButton>
+        <Link to="/find-exercise" className="w-full">
         <ConstSizeButton>Znajdź ćwiczenie</ConstSizeButton>
+        </Link>
         <LogoutButton>Wyloguj</LogoutButton>
       </div>
     </aside>
