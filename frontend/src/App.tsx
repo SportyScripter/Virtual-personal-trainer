@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import { ProtectedRoute } from "./components/ProtectRoute";
 import AddExercise from "./pages/AddExercise";
 import MyExercisesPage from "./pages/MyExercisesPage";
+import FindExercisePage from './pages/FindExercisePage';
 function App() {
   return (
     <Router>
@@ -20,6 +21,7 @@ function App() {
         <Route path="/dashboard"element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/>
         <Route path="/addExercise"element={<ProtectedRoute><AddExercise/></ProtectedRoute>}/>
         <Route path="/my-exercises"element={<ProtectedRoute><MyExercisesPage/></ProtectedRoute>}/>
+        <Route path="/find-exercise"element={<ProtectedRoute><FindExercisePage/></ProtectedRoute>}/>
 
       </Routes>
     </Router>
