@@ -5,7 +5,7 @@ from models.exercise import Exercise
 from schemas.exercise import ExerciseCreate, ResponseModelExercise
 from models.body_part import BodyPart
 from auth.utils import get_current_user
-from schemas.exercise import UserExerciseResponse
+from schemas.exercise import UserExerciseResponse, ExerciseWithTrainerResponse
 from typing import List
 from models.user import User
 import os
@@ -63,7 +63,7 @@ async def delete_last_exercise(db: Session = Depends(get_db)):
 async def get_my_exercises(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
-  
+
     exercises = (
         db.query(Exercise)
         .filter(Exercise.user_id == current_user.id)
@@ -133,4 +133,24 @@ async def delete_exercise(
     db.delete(exercise_to_delete)
     db.commit()
 
-    return None 
+    return None
+
+
+@exercise_router.get(
+    "/by-body-part/{body_part_id}",
+    response_model=List[ExerciseWithTrainerResponse],
+    summary="Pobierz ćwiczenia dla danej partii ciała wraz z danymi trenera",
+)
+async def get_exercises_by_body_part(body_part_id: int, db: Session = Depends(get_db)):
+    exercises = (
+        db.query(Exercise)
+        .join(User)
+        .filter(Exercise.body_part_id == body_part_id)
+        .options(joinedload(Exercise.user))
+        .all()
+    )
+
+    if not exercises:
+        return []
+
+    return exercises
