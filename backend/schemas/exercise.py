@@ -30,3 +30,20 @@ class UserExerciseResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ExerciseTrainerResponse(BaseModel):
+    first_name: str
+    last_name: str
+
+    class Config:
+        orm_mode = True
+
+
+class ExerciseWithTrainerResponse(BaseModel):
+    id: int
+    exercise_name: str
+    user: ExerciseTrainerResponse  
+
+    class Config:
+        orm_mode = True
