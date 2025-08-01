@@ -132,3 +132,28 @@ export const deleteExercise = async (exerciseId: number): Promise<void> => {
       throw new Error("Nie można usunąć ćwiczenia. Sprawdź połączenie.");
   }
 };
+
+
+interface ExerciseTrainer {
+  first_name: string;
+  last_name: string;
+}
+
+export interface ExerciseWithTrainer {
+  id: number;
+  exercise_name: string;
+  user: ExerciseTrainer; 
+}
+
+
+export const getExercisesByBodyPart = async (bodyPartId: number): Promise<ExerciseWithTrainer[]> => {
+  try {
+    const response = await apiClient.get<ExerciseWithTrainer[]>(`/exercise/by-body-part/${bodyPartId}`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.detail || "Błąd podczas pobierania ćwiczeń");
+    }
+    throw new Error("Nie można pobrać ćwiczeń dla tej partii ciała.");
+  }
+};
