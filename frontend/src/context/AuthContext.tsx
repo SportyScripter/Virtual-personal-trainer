@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { userData } from "../api/auth";
 
-interface User {
+export interface User {
   username: string;
   email: string;
   profile_image?: string | null;
@@ -15,6 +15,7 @@ interface AuthContextType {
   token: string | null;
   loginWithToken: (token: string) => Promise<void>;
   logout: () => void;
+  updateUserContext: (updatedUserData: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
   const [loading, setLoading] = useState<boolean>(true);
+  const updateUserContext = (updatedUserData: User) => {setUser(updatedUserData);};
 
   const fetchUser = async (authToken: string) => {
     setLoading(true);
@@ -71,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, token, loginWithToken, logout }}>
+    <AuthContext.Provider value={{ user, loading, token, loginWithToken, logout, updateUserContext }}>
       {children}
     </AuthContext.Provider>
   );
