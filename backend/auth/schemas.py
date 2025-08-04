@@ -33,7 +33,8 @@ class TokenCreate(BaseModel):
     refresh_token: str
     status: bool
     created_at: datetime.datetime
-    
+
+
 class UserResponse(BaseModel):
     id: int
     username: str

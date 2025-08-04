@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-
+import {User} from '../context/AuthContext';
 interface BodyPart {
   id: number;
   body_part_name: string;
@@ -155,5 +155,25 @@ export const getExercisesByBodyPart = async (bodyPartId: number): Promise<Exerci
       throw new Error(error.response.data.detail || "Błąd podczas pobierania ćwiczeń");
     }
     throw new Error("Nie można pobrać ćwiczeń dla tej partii ciała.");
+  }
+};
+
+
+export const uploadProfileImage = async (file: File): Promise<User> => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await apiClient.post<User>('/users/upload-profile-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.detail || "Błąd podczas wysyłania zdjęcia");
+    }
+    throw new Error("Nie można było wysłać pliku. Sprawdź połączenie.");
   }
 };
