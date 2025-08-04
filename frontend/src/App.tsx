@@ -9,6 +9,7 @@ import { ProtectedRoute } from "./components/ProtectRoute";
 import AddExercise from "./pages/AddExercise";
 import MyExercisesPage from "./pages/MyExercisesPage";
 import FindExercisePage from './pages/FindExercisePage';
+import AccountSettingsPage from "./pages/AccountSettingsPage";
 function App() {
   return (
     <Router>
@@ -22,6 +23,7 @@ function App() {
         <Route path="/addExercise"element={<ProtectedRoute><AddExercise/></ProtectedRoute>}/>
         <Route path="/my-exercises"element={<ProtectedRoute><MyExercisesPage/></ProtectedRoute>}/>
         <Route path="/find-exercise"element={<ProtectedRoute><FindExercisePage/></ProtectedRoute>}/>
+        <Route path="/account-settings"element={<ProtectedRoute><AccountSettingsPage/></ProtectedRoute>}/>
 
       </Routes>
     </Router>
