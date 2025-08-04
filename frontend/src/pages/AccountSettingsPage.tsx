@@ -49,7 +49,6 @@ const AccountSettingsPage = () => {
     }
   };
   
-  // Zbuduj pełny URL do obecnego zdjęcia profilowego
   const currentImageUrl = user?.profile_image 
     ? `http://localhost:8080${user.profile_image}` 
     : '/images/avatar.png';
