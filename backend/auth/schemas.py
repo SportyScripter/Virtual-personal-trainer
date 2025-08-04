@@ -33,3 +33,17 @@ class TokenCreate(BaseModel):
     refresh_token: str
     status: bool
     created_at: datetime.datetime
+    
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    first_name: str
+    last_name: str
+    is_active: bool
+    profile_image: str | None = None
+    create_at: datetime.datetime
+    updated_at: datetime.datetime | None = None
+
+    class Config:
+        orm_mode = True

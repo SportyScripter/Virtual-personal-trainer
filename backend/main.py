@@ -17,6 +17,7 @@ from routers.role_routers import role_routers
 from routers.body_part_routers import body_part_router
 from routers.exercise_routers import exercise_router
 from routers.exercise_video_routers import exercise_video_router
+from routers.user_routers import user_setting_router
 
 origins = ["http://localhost:5173"]
 
@@ -58,6 +59,11 @@ def start_application():
     static_files_path = "/videos"
     os.makedirs(static_files_path, exist_ok=True)
     app.mount("/videos", StaticFiles(directory=static_files_path), name="videos")
+    app.mount(
+        "/profile_images",
+        StaticFiles(directory="/profile_images"),
+        name="profile_images",
+    )
     create_table()
     return app
 
@@ -70,6 +76,7 @@ app.include_router(role_routers)
 app.include_router(body_part_router)
 app.include_router(exercise_router)
 app.include_router(exercise_video_router)
+app.include_router(user_setting_router)
 
 
 @app.get("/")

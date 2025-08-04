@@ -18,6 +18,7 @@ class User(Base):
     last_name = Column(String)
     is_active = Column(Boolean, default=1)  # 1 for active, 0 for inactive
     create_at = Column(DateTime, default=datetime.datetime.now)
+    prfile_image = Column(String, nullable=True)
     updated_at = Column(
         DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now
     )
