@@ -2,7 +2,7 @@ import MainLayout from "../components/MainLayout";
 import { useAuth } from "../context/AuthContext";
 
 const UserDashboard = () => {
-  const { user, loading} = useAuth();
+  const { user } = useAuth();
   if (!user?.username == null) return <div>Ładowanie...</div>;
   
 
