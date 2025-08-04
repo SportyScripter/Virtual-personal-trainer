@@ -37,6 +37,7 @@ services:
     volumes:
       - ./backend:/code
       - ./users_videos:/videos
+      - ./profile_images:/profile_images
     ports:
       - "8080:80"
     depends_on:
