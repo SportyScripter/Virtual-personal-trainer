@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { ConstSizeButton, LogoutButton } from "./Button";
-import TrainerDashboard from "../pages/TrainerDashboard";
 import { Link } from "react-router-dom";
-interface SidebarProps {
-  username: string | null;
-  email: string | null;
-  profileImage?: string;
-}
+import { useAuth } from '../context/AuthContext';
 
-export const UserSidebar: React.FC<SidebarProps> = ({ username, email, profileImage }) => {
+interface SidebarProps {}
+
+export const UserSidebar: React.FC<SidebarProps> = () => {
+  const { user } = useAuth(); 
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
+
+  const profileImageUrl = user?.profile_image 
+    ? `http://localhost:8080${user.profile_image}` 
+    : "/images/avatar.png";
 
   return (
     <aside className="w-64 border-r border-gray-300 p-6 bg-gray-300">
@@ -29,17 +30,19 @@ export const UserSidebar: React.FC<SidebarProps> = ({ username, email, profileIm
           </p>
         </div>
         <img
-          src={profileImage || "/images/avatar.png"}
+          src={profileImageUrl} 
           alt="avatar"
-          className="w-20 h-20 rounded-full mb-4"
+          className="w-20 h-20 rounded-full mb-4 object-cover" 
         />
-        <h3 className="text-xl font-semibold mb-1">{username}</h3>
-        <p className="text-sm mb-12 text-gray-600">{email}</p>
-
-        <ConstSizeButton>Ustawienia Konta</ConstSizeButton>
+        <h3 className="text-xl font-semibold mb-1">{user?.username}</h3>
+        <p className="text-sm mb-12 text-gray-600">{user?.email}</p>
+        
+        <Link to="/account-settings" className="w-full" style={{marginRight: "-40px"}}>
+          <ConstSizeButton>Ustawienia Konta</ConstSizeButton>
+        </Link>
         <ConstSizeButton>Trenerzy</ConstSizeButton>
-        <Link to="/find-exercise" className="w-full">
-        <ConstSizeButton>Znajdź ćwiczenie</ConstSizeButton>
+        <Link to="/find-exercise" className="w-full" style={{marginRight: "-40px"}}>
+          <ConstSizeButton>Znajdź ćwiczenie</ConstSizeButton>
         </Link>
         <LogoutButton>Wyloguj</LogoutButton>
       </div>
@@ -48,16 +51,20 @@ export const UserSidebar: React.FC<SidebarProps> = ({ username, email, profileIm
 };
 
 
-export const TrainerSidebar: React.FC<SidebarProps> = ({ username, email, profileImage }) => {
+export const TrainerSidebar: React.FC<SidebarProps> = () => {
+  const { user } = useAuth(); 
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
+
+  const profileImageUrl = user?.profile_image 
+    ? `http://localhost:8080${user.profile_image}` 
+    : "/images/avatar.png";
 
   return (
     <aside className="w-64 border-r border-gray-300 p-6 bg-gray-300">
@@ -69,19 +76,21 @@ export const TrainerSidebar: React.FC<SidebarProps> = ({ username, email, profil
           </p>
         </div>
         <img
-          src={profileImage || "/images/avatar.png"}
+          src={profileImageUrl}
           alt="avatar"
-          className="w-20 h-20 rounded-full mb-4"
+          className="w-20 h-20 rounded-full mb-4 object-cover"
         />
-        <h3 className="text-xl font-semibold mb-1">{username}</h3>
-        <p className="text-sm mb-12 text-gray-600">{email}</p>
+        <h3 className="text-xl font-semibold mb-1">{user?.username}</h3>
+        <p className="text-sm mb-12 text-gray-600">{user?.email}</p>
 
-        <ConstSizeButton>Ustawienia Konta</ConstSizeButton>
+        <Link to="/account-settings" className="w-full" style={{marginRight: "-40px"}}>
+          <ConstSizeButton>Ustawienia Konta</ConstSizeButton>
+        </Link>
         <Link to="/addExercise" className="w-full" style={{marginRight: "-40px"}}>
           <ConstSizeButton >Dodaj ćwiczenie</ConstSizeButton>
         </Link>
         <ConstSizeButton>Moi podopieczni</ConstSizeButton>
-        <Link to="/my-exercises" className="w-full">
+        <Link to="/my-exercises" className="w-full" style={{marginRight: "-40px"}}>
           <ConstSizeButton>Moje ćwiczenia</ConstSizeButton>
         </Link>
         <LogoutButton>Wyloguj</LogoutButton>
