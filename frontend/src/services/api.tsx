@@ -177,3 +177,23 @@ export const uploadProfileImage = async (file: File): Promise<User> => {
     throw new Error("Nie można było wysłać pliku. Sprawdź połączenie.");
   }
 };
+
+
+
+interface ChangePasswordData {
+  old_password: string;
+  new_password: string;
+  confirm_password: string;
+}
+
+
+export const changePassword = async (data: ChangePasswordData): Promise<void> => {
+  try {
+    await apiClient.post('/auth/change-password', data);
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.detail || "Błąd podczas zmiany hasła");
+    }
+    throw new Error("Nie można było zmienić hasła. Sprawdź połączenie.");
+  }
+};
