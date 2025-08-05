@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 import datetime
 
 
@@ -48,3 +48,10 @@ class UserResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str = Field(min_length=8, description="Password must be at least 8 characters long")
+    confirm_password: str
+    
+    

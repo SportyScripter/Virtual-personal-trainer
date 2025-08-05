@@ -8,6 +8,7 @@ from auth.schemas import (
     RequestDetails,
     TokenSchama,
     ChangePassword,
+    ChangePasswordRequest,
 )
 from db.session import get_db
 from auth.utils import (
@@ -17,6 +18,7 @@ from auth.utils import (
     get_user,
     create_refresh_token,
     get_current_active_user,
+    get_current_user,
 )
 from models.user import User
 from models.token import Token
@@ -200,23 +202,30 @@ async def login(request: RequestDetails, db: Session = Depends(get_db)):
     return get_token_response(user.id, db)
 
 
-@user_router.post("/change_password")
-async def change_password(request: RequestDetails, db: Session = Depends(get_db)):
-    user = db.query(User).filter_by(email=request.email).first()
-    if not user:
+@user_router.post("/change-password", summary="Change the current user's password")
+async def change_password(
+    request: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if not verify_password(request.old_password, current_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect email or password",
+            detail="Incorrect old password",
         )
-    hashed_pass = user.hashed_password
-    if not verify_password(request.password, hashed_pass):
+    if request.new_password != request.confirm_password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect email or password",
+            detail="New passwords do not match",
         )
-    user.hashed_password = get_hashed_password(request.new_password)
+    if verify_password(request.new_password, current_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password cannot be the same as the old password",
+        )
+    current_user.hashed_password = get_hashed_password(request.new_password)
     db.commit()
-    db.refresh(user)
+
     return {"message": "Password changed successfully"}
 
 
