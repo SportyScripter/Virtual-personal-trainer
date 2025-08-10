@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <i>A modern web application designed to connect trainers and users, enabling personalized workout plans, technique analysis, and progress tracking.</i>
+  <i>A modern web application designed to connect trainers and users, enabling technique analysis, (personalized workout plans, and progress tracking - in the future) .</i>
   <br>
   <br>
   <a href="#about-the-project">About The Project</a> •
