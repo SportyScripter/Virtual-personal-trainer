@@ -43,7 +43,17 @@ class ExerciseTrainerResponse(BaseModel):
 class ExerciseWithTrainerResponse(BaseModel):
     id: int
     exercise_name: str
-    user: ExerciseTrainerResponse  
+    user: ExerciseTrainerResponse
+
+    class Config:
+        orm_mode = True
+
+
+class ExerciseDetailResponse(BaseModel):
+    id: int
+    exercise_name: str
+    description: str | None
+    video_path: str | None
 
     class Config:
         orm_mode = True
