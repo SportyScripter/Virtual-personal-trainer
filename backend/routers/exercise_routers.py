@@ -5,7 +5,11 @@ from models.exercise import Exercise
 from schemas.exercise import ExerciseCreate, ResponseModelExercise
 from models.body_part import BodyPart
 from auth.utils import get_current_user
-from schemas.exercise import UserExerciseResponse, ExerciseWithTrainerResponse
+from schemas.exercise import (
+    UserExerciseResponse,
+    ExerciseWithTrainerResponse,
+    ExerciseDetailResponse,
+)
 from typing import List
 from models.user import User
 import os
@@ -154,3 +158,33 @@ async def get_exercises_by_body_part(body_part_id: int, db: Session = Depends(ge
         return []
 
     return exercises
+
+
+@exercise_router.get(
+    "/{exercise_id}/details",
+    response_model=ExerciseDetailResponse,
+    summary="Pobierz szczegóły konkretnego ćwiczenia",
+)
+async def get_exercise_details(exercise_id: int, db: Session = Depends(get_db)):
+    exercise = (
+        db.query(Exercise)
+        .filter(Exercise.id == exercise_id)
+        .options(joinedload(Exercise.exercise_videos))
+        .first()
+    )
+
+    if not exercise:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found"
+        )
+
+    video_path = (
+        exercise.exercise_videos[0].video_path if exercise.exercise_videos else None
+    )
+
+    return {
+        "id": exercise.id,
+        "exercise_name": exercise.exercise_name,
+        "description": exercise.description,
+        "video_path": video_path,
+    }
