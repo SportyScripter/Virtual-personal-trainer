@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/MainLayout';
-import { getBodyParts, getExercisesByBodyPart, ExerciseWithTrainer } from '../services/api';
+import { getBodyParts, getExercisesByBodyPart, ExerciseWithTrainer, ExerciseDetails, getExerciseDetails } from '../services/api';
+import { ArrowLeft } from 'lucide-react';
 
 interface BodyPart {
     id: number;
@@ -11,6 +12,8 @@ const FindExercisePage = () => {
     const [bodyParts, setBodyParts] = useState<BodyPart[]>([]);
     const [selectedBodyPart, setSelectedBodyPart] = useState<BodyPart | null>(null);
     const [exercises, setExercises] = useState<ExerciseWithTrainer[]>([]);
+    const [selectedExerciseDetails, setSelectedExerciseDetails] = useState<ExerciseDetails | null>(null);
+    const [isModalLoading, setIsModalLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -43,6 +46,25 @@ const FindExercisePage = () => {
         }
     };
 
+    const handleExerciseClick = async (exerciseId: number) => {
+        setIsModalLoading(true);
+        setError(null);
+        try {
+            const details = await getExerciseDetails(exerciseId);
+            setSelectedExerciseDetails(details);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsModalLoading(false);
+        }
+    };
+
+    const handleCompareTechnique = (videoPath: string) => {
+        console.log("Wybrano wideo do porównania:", videoPath);
+        alert("Ścieżka do wideo została zapisana! (Sprawdź konsolę)");
+        setSelectedExerciseDetails(null); 
+    };
+
     const renderExercisesTable = () => (
         <div>
             <button
@@ -67,7 +89,11 @@ const FindExercisePage = () => {
                         </thead>
                         <tbody>
                             {exercises.map(exercise => (
-                                <tr key={exercise.id} className="border-b border-gray-700 hover:bg-gray-600">
+                                <tr
+                                    key={exercise.id}
+                                    className="border-b border-gray-700 hover:bg-gray-600 cursor-pointer"
+                                    onClick={() => handleExerciseClick(exercise.id)}
+                                >
                                     <td className="px-6 py-4 font-medium text-white">{exercise.exercise_name}</td>
                                     <td className="px-6 py-4">{`${exercise.user.first_name} ${exercise.user.last_name}`}</td>
                                 </tr>
@@ -85,10 +111,7 @@ const FindExercisePage = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {bodyParts.map((part) => (
                 <button
-                    key={part.id}
-                    onClick={() => handleSelectBodyPart(part)}
-                    className="p-6 bg-gray-700 rounded-lg text-white font-semibold text-center hover:bg-indigo-600 transition-colors"
-                >
+                    key={part.id} onClick={() => handleSelectBodyPart(part)} className="p-6 bg-gray-700 rounded-lg text-white font-semibold text-center hover:bg-indigo-600 transition-colors">
                     {part.body_part_name}
                 </button>
             ))}
@@ -99,9 +122,60 @@ const FindExercisePage = () => {
             <h1 className="text-3xl font-bold mb-6 text-white">Znajdź Ćwiczenie</h1>
             {isLoading && !selectedBodyPart && <p className="text-white">Ładowanie partii ciała...</p>}
             {error && <p className="text-red-500">Błąd: {error}</p>}
-
             {!isLoading && (selectedBodyPart ? renderExercisesTable() : renderBodyPartSelection())}
+            {(isModalLoading || selectedExerciseDetails) && (
+                isModalLoading ? (
+                    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                        <p className="text-white">Ładowanie szczegółów...</p>
+                    </div>
+                ) : selectedExerciseDetails && (
+                    <ExerciseDetailModal
+                        exercise={selectedExerciseDetails}
+                        onClose={() => setSelectedExerciseDetails(null)}
+                        onCompare={handleCompareTechnique}
+                    />
+                )
+            )}
         </MainLayout>
+    );
+};
+
+const ExerciseDetailModal = ({ exercise, onClose, onCompare }: { exercise: ExerciseDetails, onClose: () => void, onCompare: (videoPath: string) => void }) => {
+    const videoUrl = exercise.video_path ? `http://localhost:8080/videos/${exercise.video_path}` : '';
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={onClose}>
+            <div className="bg-gray-800 p-6 rounded-lg max-w-3xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                <h2 className="text-2xl font-bold text-white mb-4">{exercise.exercise_name}</h2>
+
+                {videoUrl ? (
+                    <video src={videoUrl} controls autoPlay className="w-full rounded-md mb-4 bg-black">
+                        Twoja przeglądarka nie obsługuje tagu wideo.
+                    </video>
+                ) : (
+                    <div className="w-full aspect-video bg-black flex items-center justify-center rounded-md mb-4">
+                        <p className="text-gray-500">Brak wideo dla tego ćwiczenia.</p>
+                    </div>
+                )}
+
+                <h3 className="text-lg font-semibold text-white">Opis:</h3>
+                <p className="text-gray-300 mt-2 mb-6">{exercise.description || 'Brak opisu.'}</p>
+
+                <div className="flex justify-between items-center">
+                    <button onClick={onClose} className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-500">
+                        <ArrowLeft size={18} />
+                        Wstecz
+                    </button>
+                    <button
+                        onClick={() => onCompare(videoUrl)}
+                        disabled={!videoUrl}
+                        className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-md hover:bg-indigo-700 disabled:bg-gray-500 disabled:cursor-not-allowed"
+                    >
+                        Porównaj technikę
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 };
 
