@@ -1,13 +1,13 @@
 
 import axios from 'axios';
-import {User} from '../context/AuthContext';
+import { User } from '../context/AuthContext';
 interface BodyPart {
   id: number;
   body_part_name: string;
 }
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080', 
+  baseURL: 'http://localhost:8080',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -16,11 +16,11 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    
+
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     return config;
   },
   (error) => {
@@ -124,12 +124,12 @@ export const getMyExercises = async (): Promise<UserExercise[]> => {
 
 export const deleteExercise = async (exerciseId: number): Promise<void> => {
   try {
-      await apiClient.delete(`/exercise/${exerciseId}`);
+    await apiClient.delete(`/exercise/${exerciseId}`);
   } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-          throw new Error(error.response.data.detail || "Błąd podczas usuwania ćwiczenia");
-      }
-      throw new Error("Nie można usunąć ćwiczenia. Sprawdź połączenie.");
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.detail || "Błąd podczas usuwania ćwiczenia");
+    }
+    throw new Error("Nie można usunąć ćwiczenia. Sprawdź połączenie.");
   }
 };
 
@@ -142,7 +142,7 @@ interface ExerciseTrainer {
 export interface ExerciseWithTrainer {
   id: number;
   exercise_name: string;
-  user: ExerciseTrainer; 
+  user: ExerciseTrainer;
 }
 
 
@@ -195,5 +195,24 @@ export const changePassword = async (data: ChangePasswordData): Promise<void> =>
       throw new Error(error.response.data.detail || "Błąd podczas zmiany hasła");
     }
     throw new Error("Nie można było zmienić hasła. Sprawdź połączenie.");
+  }
+};
+
+export interface ExerciseDetails {
+  id: number;
+  exercise_name: string;
+  description: string | null;
+  video_path: string | null;
+}
+
+export const getExerciseDetails = async (exerciseId: number): Promise<ExerciseDetails> => {
+  try {
+    const response = await apiClient.get<ExerciseDetails>(`/exercise/${exerciseId}/details`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.detail || "Błąd podczas pobierania szczegółów ćwiczenia");
+    }
+    throw new Error("Nie można pobrać danych ćwiczenia.");
   }
 };
