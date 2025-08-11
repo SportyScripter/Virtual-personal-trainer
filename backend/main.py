@@ -18,6 +18,7 @@ from routers.body_part_routers import body_part_router
 from routers.exercise_routers import exercise_router
 from routers.exercise_video_routers import exercise_video_router
 from routers.user_routers import user_setting_router
+from routers.analysis_routers import analysis_router
 
 origins = ["http://localhost:5173"]
 
@@ -77,6 +78,7 @@ app.include_router(body_part_router)
 app.include_router(exercise_router)
 app.include_router(exercise_video_router)
 app.include_router(user_setting_router)
+app.include_router(analysis_router)
 
 
 @app.get("/")
