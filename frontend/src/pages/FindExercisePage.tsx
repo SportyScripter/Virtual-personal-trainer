@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../components/MainLayout';
-import { getBodyParts, getExercisesByBodyPart, ExerciseWithTrainer, ExerciseDetails, getExerciseDetails } from '../services/api';
-import { ArrowLeft } from 'lucide-react';
+import { getBodyParts, getExercisesByBodyPart, ExerciseWithTrainer, ExerciseDetails, getExerciseDetails, compareTechnique, AnalysisResult } from '../services/api';
+import { ArrowLeft, UploadCloud } from 'lucide-react';
+import { useDropzone } from 'react-dropzone';
 
 interface BodyPart {
     id: number;
@@ -16,6 +17,7 @@ const FindExercisePage = () => {
     const [isModalLoading, setIsModalLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [trainerVideoToCompare, setTrainerVideoToCompare] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchInitialData = async () => {
@@ -62,7 +64,8 @@ const FindExercisePage = () => {
     const handleCompareTechnique = (videoPath: string) => {
         console.log("Wybrano wideo do porównania:", videoPath);
         alert("Ścieżka do wideo została zapisana! (Sprawdź konsolę)");
-        setSelectedExerciseDetails(null); 
+        setSelectedExerciseDetails(null);
+        setTrainerVideoToCompare(videoPath);
     };
 
     const renderExercisesTable = () => (
@@ -117,6 +120,8 @@ const FindExercisePage = () => {
             ))}
         </div>
     );
+
+
     return (
         <MainLayout>
             <h1 className="text-3xl font-bold mb-6 text-white">Znajdź Ćwiczenie</h1>
@@ -135,6 +140,12 @@ const FindExercisePage = () => {
                         onCompare={handleCompareTechnique}
                     />
                 )
+            )}
+            {trainerVideoToCompare && (
+                <CompareTechniqueModal
+                    trainerVideoPath={trainerVideoToCompare}
+                    onClose={() => setTrainerVideoToCompare(null)}
+                />
             )}
         </MainLayout>
     );
@@ -178,6 +189,86 @@ const ExerciseDetailModal = ({ exercise, onClose, onCompare }: { exercise: Exerc
         </div>
     );
 };
+
+const CompareTechniqueModal = ({ trainerVideoPath, onClose }: { trainerVideoPath: string, onClose: () => void }) => {
+    const [userVideo, setUserVideo] = useState<File | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const onDrop = useCallback((acceptedFiles: File[]) => {
+        if (acceptedFiles?.length) {
+            setUserVideo(acceptedFiles[0]);
+        }
+    }, []);
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: { 'video/*': [] },
+        maxFiles: 1,
+    });
+
+    const handleAnalyze = async () => {
+        if (!userVideo) return;
+        setIsLoading(true);
+        setError(null);
+        try {
+            const result = await compareTechnique(userVideo, trainerVideoPath);
+            setAnalysisResult(result);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={onClose}>
+            <div className="bg-gray-800 p-6 rounded-lg max-w-2xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                {!analysisResult ? (
+                    <>
+                        <h2 className="text-2xl font-bold text-white mb-4">Porównaj swoją technikę</h2>
+                        <div
+                            {...getRootProps()}
+                            className={`p-10 border-2 border-dashed rounded-md text-center cursor-pointer transition-colors
+                    ${isDragActive ? 'border-indigo-500 bg-gray-700' : 'border-gray-600'}
+                  `}
+                        >
+                            <input {...getInputProps()} />
+                            <UploadCloud className="mx-auto text-gray-400" size={48} />
+                            {userVideo ? (
+                                <p className="mt-2 text-green-400">Wybrano plik: {userVideo.name}</p>
+                            ) : (
+                                <p className="mt-2 text-gray-400">Przeciągnij i upuść swoje wideo lub kliknij, aby wybrać plik</p>
+                            )}
+                        </div>
+                        <button
+                            onClick={handleAnalyze}
+                            disabled={!userVideo || isLoading}
+                            className="w-full mt-6 px-8 py-3 bg-indigo-600 text-white font-bold rounded-md hover:bg-indigo-700 disabled:bg-gray-500"
+                        >
+                            {isLoading ? 'Analizowanie...' : 'Analizuj'}
+                        </button>
+                        {error && <p className="mt-4 text-center text-red-500">{error}</p>}
+                    </>
+                ) : (
+                    <>
+                        <h2 className="text-2xl font-bold text-white mb-4">Wynik analizy</h2>
+                        <img
+                            src={`http://localhost:8080${analysisResult.result_image_url}`}
+                            alt="Wynik analizy"
+                            className="w-full rounded-md bg-black"
+                        />
+                        <p className="text-center text-gray-300 mt-4">{analysisResult.message}</p>
+                        <button onClick={onClose} className="w-full mt-6 px-8 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-500">
+                            Zamknij
+                        </button>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+};
+
 
 export default FindExercisePage;
 
