@@ -216,3 +216,29 @@ export const getExerciseDetails = async (exerciseId: number): Promise<ExerciseDe
     throw new Error("Nie można pobrać danych ćwiczenia.");
   }
 };
+
+export interface AnalysisResult {
+  message: string;
+  result_video_url: string;
+}
+
+export const compareTechnique = async (userVideo: File, trainerVideoPath: string): Promise<AnalysisResult> => {
+  const formData = new FormData();
+  formData.append('user_video', userVideo);
+  formData.append('trainer_video_path', trainerVideoPath);
+
+  try {
+    const response = await apiClient.post<AnalysisResult>('/analysis/compare-videos', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.detail || "Błąd podczas wysyłania wideo do analizy");
+    }
+    throw new Error("Nie można było przeanalizować wideo.");
+  }
+};
+
