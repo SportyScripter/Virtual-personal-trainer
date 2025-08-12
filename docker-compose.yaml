@@ -38,6 +38,7 @@ services:
       - ./backend:/code
       - ./users_videos:/videos
       - ./profile_images:/profile_images
+      - ./analysis_results:/analysis_results
     ports:
       - "8080:80"
     depends_on:
