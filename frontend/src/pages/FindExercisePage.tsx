@@ -63,7 +63,6 @@ const FindExercisePage = () => {
 
     const handleCompareTechnique = (videoPath: string) => {
         console.log("Wybrano wideo do porównania:", videoPath);
-        alert("Ścieżka do wideo została zapisana! (Sprawdź konsolę)");
         setSelectedExerciseDetails(null);
         setTrainerVideoToCompare(videoPath);
     };
@@ -178,8 +177,12 @@ const ExerciseDetailModal = ({ exercise, onClose, onCompare }: { exercise: Exerc
                         Wstecz
                     </button>
                     <button
-                        onClick={() => onCompare(videoUrl)}
-                        disabled={!videoUrl}
+                        onClick={() => {
+                            if (exercise.video_path) {
+                                onCompare(exercise.video_path);
+                            }
+                        }}
+                        disabled={!exercise.video_path}
                         className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-md hover:bg-indigo-700 disabled:bg-gray-500 disabled:cursor-not-allowed"
                     >
                         Porównaj technikę
@@ -253,12 +256,15 @@ const CompareTechniqueModal = ({ trainerVideoPath, onClose }: { trainerVideoPath
                 ) : (
                     <>
                         <h2 className="text-2xl font-bold text-white mb-4">Wynik analizy</h2>
-                        <img
-                            src={`http://localhost:8080${analysisResult.result_image_url}`}
-                            alt="Wynik analizy"
+                        <video
+                            src={`http://localhost:8080${analysisResult.result_video_url}`}
+                            controls
+                            autoPlay
                             className="w-full rounded-md bg-black"
-                        />
-                        <p className="text-center text-gray-300 mt-4">{analysisResult.message}</p>
+                        >
+                            Twoja przeglądarka nie obsługuje tagu wideo.
+                        </video>
+                        <p className="text-center text-gray-300 mt-4">Analiza zakończona.</p>
                         <button onClick={onClose} className="w-full mt-6 px-8 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-500">
                             Zamknij
                         </button>

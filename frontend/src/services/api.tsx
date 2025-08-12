@@ -219,7 +219,7 @@ export const getExerciseDetails = async (exerciseId: number): Promise<ExerciseDe
 
 export interface AnalysisResult {
   message: string;
-  result_image_url: string;
+  result_video_url: string;
 }
 
 export const compareTechnique = async (userVideo: File, trainerVideoPath: string): Promise<AnalysisResult> => {
@@ -241,3 +241,4 @@ export const compareTechnique = async (userVideo: File, trainerVideoPath: string
     throw new Error("Nie można było przeanalizować wideo.");
   }
 };
+
