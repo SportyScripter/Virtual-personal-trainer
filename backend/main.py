@@ -57,28 +57,53 @@ def start_application():
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.include_router(user_router)
+    app.include_router(role_routers)
+    app.include_router(body_part_router)
+    app.include_router(exercise_router)
+    app.include_router(exercise_video_router)
+    app.include_router(user_setting_router)
+    app.include_router(analysis_router)
     static_files_path = "/videos"
+    static_files_path2 = "/analysis_results"
     os.makedirs(static_files_path, exist_ok=True)
+    os.makedirs(static_files_path2, exist_ok=True)
     app.mount("/videos", StaticFiles(directory=static_files_path), name="videos")
     app.mount(
         "/profile_images",
         StaticFiles(directory="/profile_images"),
         name="profile_images",
     )
+    app.mount(
+        "/analysis_results",
+        StaticFiles(directory=static_files_path2),
+        name="analysis_results",
+    )
+
+    videos_dir = "users_videos"
+    profile_images_dir = "profile_images"
+    analysis_results_dir = "analysis_results"
+
+    os.makedirs(videos_dir, exist_ok=True)
+    os.makedirs(profile_images_dir, exist_ok=True)
+    os.makedirs(analysis_results_dir, exist_ok=True)
+
+    app.mount(f"/{videos_dir}", StaticFiles(directory=videos_dir), name="videos")
+    app.mount(
+        f"/{profile_images_dir}",
+        StaticFiles(directory=profile_images_dir),
+        name="profile_images",
+    )
+    app.mount(
+        f"/{analysis_results_dir}",
+        StaticFiles(directory=analysis_results_dir),
+        name="analysis_results",
+    )
     create_table()
     return app
 
 
 app = start_application()
-
-
-app.include_router(user_router)
-app.include_router(role_routers)
-app.include_router(body_part_router)
-app.include_router(exercise_router)
-app.include_router(exercise_video_router)
-app.include_router(user_setting_router)
-app.include_router(analysis_router)
 
 
 @app.get("/")
