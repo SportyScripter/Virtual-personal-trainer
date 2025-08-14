@@ -59,6 +59,61 @@ def normalize_frames(frames, target_length):
     return f(x_new)
 
 
+def get_landmark(results, landmark_name):
+    """Pobiera cały obiekt landmark na podstawie nazwy."""
+    if results.pose_landmarks:
+        try:
+            return results.pose_landmarks.landmark[
+                getattr(mp.solutions.pose.PoseLandmark, landmark_name)
+            ]
+        except AttributeError:
+            return None
+    return None
+
+
+def detect_orientation(results):
+    """Wykrywa orientację na podstawie względnego położenia nosa i środka ciała."""
+    if not results.pose_landmarks:
+        return "unknown"
+
+    # kluczowe punkty
+    left_shoulder = get_landmark(results, "LEFT_SHOULDER")
+    right_shoulder = get_landmark(results, "RIGHT_SHOULDER")
+    left_hip = get_landmark(results, "LEFT_HIP")
+    right_hip = get_landmark(results, "RIGHT_HIP")
+    nose = get_landmark(results, "NOSE")
+
+    # Analiza barków
+    if left_shoulder and right_shoulder and nose:
+        shoulder_center_x = (left_shoulder.x + right_shoulder.x) / 2
+        shoulder_dist_x = abs(left_shoulder.x - right_shoulder.x)
+
+        # Jeśli barki są szeroko rozstawione, to jest widok od przodu/tyłu
+        if shoulder_dist_x > 0.1:
+            return "front"
+        # Jeśli barki są blisko siebie, to jest profil. Sprawdź położenie nosa.
+        else:
+            if nose.x < shoulder_center_x:
+                return "right_profile"  # Widoczny prawy profil (patrzy w lewo)
+            else:
+                return "left_profile"  # Widoczny lewy profil (patrzy w prawo)
+
+    #  Analiza bioder (jeśli barki są niewidoczne)
+    if left_hip and right_hip and nose:
+        hip_center_x = (left_hip.x + right_hip.x) / 2
+        hip_dist_x = abs(left_hip.x - right_hip.x)
+
+        if hip_dist_x > 0.1:
+            return "front"
+        else:
+            if nose.x < hip_center_x:
+                return "right_profile"
+            else:
+                return "left_profile"
+
+    return "unknown"
+
+
 async def process_and_combine_videos(
     trainer_video_path: str, user_video_path: str, output_path: str
 ):
@@ -99,34 +154,53 @@ async def process_and_combine_videos(
         # Przetwarzanie klatek przez MediaPipe Pose
         results1 = pose.process(frame1_rgb)
         results2 = pose.process(frame2_rgb)
-        # --- ANALIZA KĄTÓW ---
 
-        # 1. Pobierz współrzędne kluczowych stawów dla obu postaci
-        trainer_shoulder = get_landmark_coordinates(mp_pose, results1, "RIGHT_SHOULDER")
-        trainer_hip = get_landmark_coordinates(mp_pose, results1, "RIGHT_HIP")
-        trainer_knee = get_landmark_coordinates(mp_pose, results1, "RIGHT_KNEE")
+        orientation = detect_orientation(results1)
+        frame_scores = []
+        joints = {
+            "ELBOW": ("SHOULDER", "ELBOW", "WRIST"),
+            "SHOULDER": ("HIP", "SHOULDER", "ELBOW"),
+            "HIP": ("SHOULDER", "HIP", "KNEE"),
+            "KNEE": ("HIP", "KNEE", "ANKLE"),
+        }
 
-        user_shoulder = get_landmark_coordinates(mp_pose, results2, "RIGHT_SHOULDER")
-        user_hip = get_landmark_coordinates(mp_pose, results2, "RIGHT_HIP")
-        user_knee = get_landmark_coordinates(mp_pose, results2, "RIGHT_KNEE")
+        sides = []
+        if orientation == "left_profile":
+            sides = ["LEFT_"]
+        elif orientation == "right_profile":
+            sides = ["RIGHT_"]
+        elif orientation == "front":
+            sides = ["LEFT_", "RIGHT_"]
 
-        # 2. Oblicz kąt w biodrze dla obu postaci
-        trainer_angle = calculate_angle(trainer_shoulder, trainer_hip, trainer_knee)
-        user_angle = calculate_angle(user_shoulder, user_hip, user_knee)
-
-        # 3. Porównaj kąty i wyświetl informację na wideo użytkownika
-        feedback_text = ""
-        color = (255, 255, 255)  # biały
-
-        if trainer_angle is not None and user_angle is not None:
+        if sides:
             total_frames += 1
-            if abs(trainer_angle - user_angle) <= 2:
+            for side in sides:
+                for joint, points in joints.items():
+                    p1_name, p2_name, p3_name = (side + p for p in points)
+
+                    trainer_p1, trainer_p2, trainer_p3 = (
+                        get_landmark(results1, name)
+                        for name in (p1_name, p2_name, p3_name)
+                    )
+                    user_p1, user_p2, user_p3 = (
+                        get_landmark(results2, name)
+                        for name in (p1_name, p2_name, p3_name)
+                    )
+
+                    trainer_angle = calculate_angle(trainer_p1, trainer_p2, trainer_p3)
+                    user_angle = calculate_angle(user_p1, user_p2, user_p3)
+
+                    if trainer_angle is not None and user_angle is not None:
+                        if abs(trainer_angle - user_angle) <= 15:
+                            frame_scores.append(1)
+                        else:
+                            frame_scores.append(0)
+
+            if frame_scores and (sum(frame_scores) / len(frame_scores)) > 0.75:
                 good_points += 1
-                feedback_text = "Technika poprawna"
-                color = (0, 255, 0)  # Zielony
+                feedback_text, color = "Technika poprawna", (0, 255, 0)
             else:
-                feedback_text = "Popraw blad!"
-                color = (0, 0, 255)  # Czerwony
+                feedback_text, color = "Popraw blad!", (0, 0, 255)
 
         # Wyświetl tekst na klatce użytkownika
         cv2.putText(
