@@ -191,7 +191,7 @@ async def process_and_combine_videos(
                     user_angle = calculate_angle(user_p1, user_p2, user_p3)
 
                     if trainer_angle is not None and user_angle is not None:
-                        if abs(trainer_angle - user_angle) <= 15:
+                        if abs(trainer_angle - user_angle) <= 10:
                             frame_scores.append(1)
                         else:
                             frame_scores.append(0)
