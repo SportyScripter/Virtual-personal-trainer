@@ -71,12 +71,6 @@ def check_is_correct_string(string: str):
 
 
 def password_is_correct(password: str):
-    if len(password) < 8:
-        return False
-    if not any(char.isupper() for char in password):
-        return False
-    if not any(char.islower() for char in password):
-        return False
     table_with_correct_characters = [
         "!",
         "@",
@@ -109,11 +103,17 @@ def password_is_correct(password: str):
         "?",
         "/",
     ]
-    return (
-        True
-        if all(char not in table_with_correct_characters for char in password)
-        else False
-    )
+    if len(password) < 8:
+        return False
+    if not any(char.isupper() for char in password):
+        return False
+    if not any(char.islower() for char in password):
+        return False
+    if not any(char.isdigit() for char in password):
+        return False
+    if not any(char in table_with_correct_characters for char in password):
+        return False
+    return True
 
 
 def get_token_response(user_id: int, db: Session):
