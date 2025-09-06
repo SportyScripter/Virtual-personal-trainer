@@ -11,7 +11,7 @@ const VideoModal = ({ exercise, onClose }: { exercise: UserExercise; onClose: ()
           <div className="bg-gray-800 p-6 rounded-lg max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-2xl font-bold text-white mb-4">{exercise.exercise_name}</h2>
             {exercise.videos.length > 0 ? (
-              <video src={videoUrl} controls autoPlay className="w-full rounded-md mb-4">
+              <video src={videoUrl} controls autoPlay className="w-full max-w-sm max-h-128 mx-auto rounded-md bg-black object-contain">
                 Twoja przeglądarka nie obsługuje tagu wideo.
               </video>
             ) : (

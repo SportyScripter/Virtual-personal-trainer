@@ -69,15 +69,11 @@ def start_application():
     os.makedirs(static_files_path, exist_ok=True)
     os.makedirs(static_files_path2, exist_ok=True)
     app.mount("/videos", StaticFiles(directory=static_files_path), name="videos")
+    app.mount("/analysis_results",StaticFiles(directory=static_files_path2),name="analysis_results")
     app.mount(
         "/profile_images",
         StaticFiles(directory="/profile_images"),
         name="profile_images",
-    )
-    app.mount(
-        "/analysis_results",
-        StaticFiles(directory=static_files_path2),
-        name="analysis_results",
     )
 
     videos_dir = "users_videos"

@@ -113,7 +113,10 @@ const FindExercisePage = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {bodyParts.map((part) => (
                 <button
-                    key={part.id} onClick={() => handleSelectBodyPart(part)} className="p-6 bg-gray-700 rounded-lg text-white font-semibold text-center hover:bg-indigo-600 transition-colors">
+                    key={part.id} onClick={() => handleSelectBodyPart(part)} 
+                    className="p-6 bg-gray-700 rounded-lg
+                    text-white font-semibold text-center
+                    hover:bg-indigo-600 transition-colors">
                     {part.body_part_name}
                 </button>
             ))}
@@ -159,7 +162,7 @@ const ExerciseDetailModal = ({ exercise, onClose, onCompare }: { exercise: Exerc
                 <h2 className="text-2xl font-bold text-white mb-4">{exercise.exercise_name}</h2>
 
                 {videoUrl ? (
-                    <video src={videoUrl} controls autoPlay className="w-full rounded-md mb-4 bg-black">
+                    <video src={videoUrl} controls autoPlay className="w-full max-w-sm max-h-128 mx-auto rounded-md bg-black object-contain">
                         Twoja przeglądarka nie obsługuje tagu wideo.
                     </video>
                 ) : (
@@ -260,7 +263,7 @@ const CompareTechniqueModal = ({ trainerVideoPath, onClose }: { trainerVideoPath
                             src={`http://localhost:8080${analysisResult.result_video_url}`}
                             controls
                             autoPlay
-                            className="w-full rounded-md bg-black"
+                            className="w-full max-w-sm max-h-128 mx-auto rounded-md bg-black object-contain"
                         >
                             Twoja przeglądarka nie obsługuje tagu wideo.
                         </video>
