@@ -149,7 +149,7 @@ async def get_exercises_by_body_part(body_part_id: int, db: Session = Depends(ge
     exercises = (
         db.query(Exercise)
         .join(User)
-        .filter(Exercise.body_part_id == body_part_id)
+        .filter((Exercise.body_part_id == body_part_id) & (User.user_role == "2"))
         .options(joinedload(Exercise.user))
         .all()
     )
